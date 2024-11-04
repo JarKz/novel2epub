@@ -1,3 +1,5 @@
+use clap::Parser;
+use clap_derive::Parser;
 use converter::generate_epub;
 use mangalib_api::MangalibApi;
 
@@ -5,9 +7,24 @@ mod converter;
 mod declarative_macros;
 mod mangalib_api;
 
+/// The application that can convert any possible novel from RanobeLib into EPUB document for usage
+/// in e-ink readers.
+#[derive(Parser)]
+struct Command {
+    /// The URL of novel's main page in RanobeLib
+    #[clap(short, long)]
+    url: String,
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let novel_name = "11990--jubuldo-absnen-hoegu";
+    let command = Command::parse();
+    let url_before_query_params = command.url.split_once('?').unwrap_or((&command.url, "")).0;
+    let novel_name = url_before_query_params
+        .split('/')
+        .rev()
+        .next()
+        .expect("expected an name of novel");
 
     let api = MangalibApi::new();
     let novel_info = api.get_info(novel_name).await?;

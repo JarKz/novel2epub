@@ -36,3 +36,8 @@ To get detail about chapter, use the template: `https://api.mangalib.me/api/mang
 
 I didn't go deeper into detail about each api because each of you can test, using any browser like firefox (fuck you, google chrome).
 And that's all API which I use to make epub document from information which fetched by API above.
+
+## Why the downloading is so long?
+
+It's because the mangalib API have a restrictment by request count. Around 100 requests per some seconds.
+So be patient and wait before the code resolves and downloads the remaining chapters.

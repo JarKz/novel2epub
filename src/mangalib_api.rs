@@ -101,7 +101,9 @@ impl MangalibApi {
 
         let mut chapters = Vec::with_capacity(chapter_infos.len());
         for fetched_chapter in fetched_chapters {
-            chapters.push(fetched_chapter.await?);
+            let chapter = fetched_chapter.await?;
+            println!("Downloaded a chapter: {}", chapter.name);
+            chapters.push(chapter);
         }
 
         Ok(chapters)

@@ -2,6 +2,17 @@
 
 The Rust application which can parse particular novel by URL from ranobelib and convert into epub.
 
+## Usage
+
+Visit any novel's main page in RanobeLib. For example, `https://ranobelib.me/ru/book/26690--omniscient-readers-viewpoint-novel?section=info&ui=3716286`
+and copy the URL from bar in browser. Pass the url into application:
+
+```bash
+cargo run -- --url {insert_url_here}
+```
+
+Wait some time and the EPUB document is ready!
+
 ## The simplicity of EPUB
 
 The main goal that make readable document for any e-ink readers like Amazon Kindle Paperwhite/Oasis/Scribe.

@@ -101,9 +101,18 @@ impl MangalibApi {
 
         let mut chapters = Vec::with_capacity(chapter_infos.len());
         for fetched_chapter in fetched_chapters {
-            let chapter = fetched_chapter.await?;
-            println!("Downloaded a chapter: {}", chapter.name);
-            chapters.push(chapter);
+
+            match fetched_chapter.await {
+                Ok(chapter) => {
+                    println!("Downloaded a chapter: {}", chapter.name);
+                    chapters.push(chapter);
+                }
+                Err(e) => {
+                    println!("Error while downloading a chapter: {:?}", e);
+                    // Skip the chapter if it failed to download
+                    continue;
+                }
+            }
         }
 
         Ok(chapters)
@@ -131,10 +140,32 @@ fn get_url(name: &str) -> String {
 }
 
 fn get_data<T: DeserializeOwned>(json: &str) -> anyhow::Result<T> {
-    Ok(serde_json::from_value(
-        serde_json::from_str::<Value>(json)?
-            .get("data")
-            .unwrap()
-            .clone(),
-    )?)
+    // Parse the full JSON string first
+    let mut full_json: Value = serde_json::from_str(json)?;
+    
+    // Extract the "data" field
+    let data_value = full_json.get_mut("data")
+        .ok_or_else(|| anyhow::anyhow!("Missing 'data' field in JSON"))?;
+    
+    // Check if this is a chapter with structured content and convert to string if needed
+    if let Some(obj) = data_value.get("content").and_then(|c| c.as_object()) {
+        // It's a structured content - convert to simplified string
+        if data_value.is_object() {
+            let content_obj = data_value["content"].clone();
+            // Replace the structured content with a simple string representation
+            data_value["content"] = Value::String(content_obj.to_string());
+        }
+    }
+    
+    // Deserialize the modified data field into the target type
+    match serde_json::from_value(data_value.clone()) {
+        Ok(data) => Ok(data),
+        Err(e) => {
+            // Log error details for debugging
+            println!("JSON parsing error: {:?}", e);
+            println!("Problem JSON data: {}", 
+                &data_value.to_string()[..std::cmp::min(100, data_value.to_string().len())]);
+            Err(anyhow::anyhow!("Failed to parse JSON data: {}", e))
+        }
+    }
 }

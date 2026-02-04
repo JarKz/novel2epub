@@ -2,6 +2,11 @@
 
 The Rust application which can parse particular novel by URL from ranobelib and convert into epub.
 
+> [!WARNING]
+> RanobeLib updated their API, and it's no longer available for straightforward use, breaking the application.
+> The Author (me) is not interested to fix this, because it increases the complexity of use.
+> If you're interested to make the application independent of RanobeLib and use other API, open an issue with proposal.
+
 ## Usage
 
 Visit any novel's main page in RanobeLib. For example, `https://ranobelib.me/ru/book/26690--omniscient-readers-viewpoint-novel?section=info&ui=3716286`
